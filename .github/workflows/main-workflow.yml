@@ -1,0 +1,48 @@
+name: CI - Feature to Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Run backend tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm test
+
+      # Create Pull Request to merge dev into main
+      - name: Create Pull Request to Merge Dev into Main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.TOKEN }}  
+          branch: main
+          commit-message: "Merge dev into main"
+          title: "Merge dev into main"
+          body: |
+            Automated merge of dev into main after successful tests.
+        #   delete-branch: false
